@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Green Cycle</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Language Selector -->
+  <div style="text-align:right; padding: 10px;">
+    <select id="langSelect" onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="te">తెలుగు</option>
+      <option value="hi">हिंदी</option>
+    </select>
+  </div>
+  
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-section"></div>
+      <div class="title-section">
+        <img src="logo.png" alt="Logo" style="width:150px; float:left; margin-right: 20px;">
+        <img src="image1.jpeg" alt="img" style="width: 250px; height: 200px; float:right; margin-left: 20px;">
+        <h1 id="dashboard"></h1>
+        <p id="subtitle"></p>
+      </div>
+      <div class="menu-icon" onclick="openNav()">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Sidebar -->
+  <div id="mySidenav" class="sidenav">
+    <span class="closebtn" onclick="closeNav()">&times;</span>
+    <a href="#" onclick="showSection('Home')">Home</a>
+    <a href="#" onclick="showSection('profile')">Profile</a>
+    <a href="#" onclick="showSection('waste')">Waste Contribution</a>
+    <a href="#" onclick="showSection('pickup')">Pickup</a>
+    <a href="#" onclick="showSection('pickup_tracking')">Pickup Tracking</a>
+    <a href="#" onclick="showSection('farmerSection')">Farmer</a>
+    <a href="#" onclick="logout()" id="logoutNav"></a>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div id="Home" class="section" style="display:block;">
+      <h2 id="welcome"></h2>
+      <p id="subtitle2"></p>
+      <div class="slider">
+        <div class="nav-arrow nav-left">&#60;</div>
+        <div class="nav-arrow nav-right">&#62;</div>
+        <div class="slides" id="slides">
+          <img src="image1.jpeg" alt="Image 1" />
+          <img src="image4.jpeg" alt="Image 2" />
+          <img src="image-5.png" alt="Image 3" />
+          <img src="img4.jpeg" alt="Image 4" />
+          <img src="img5.jpeg" alt="Image 5" />
+          <img src="image-6.png" alt="Image 6" />
+        </div>
+      </div>
+    </div>
+
+    <div id="profile" class="section" style="display:none;">
+      <h2 id="profile_title"></h2>
+      <div class="profile-container">
+        <label for="name" id="label_name"></label>
+        <input type="text" id="name" />
+        <label for="email" id="label_email"></label>
+        <input type="email" id="email" />
+        <label for="phone" id="label_phone"></label>
+        <input type="tel" id="phone" />
+        <label for="address" id="label_address"></label>
+        <input type="text" id="address" />
+        <button onclick="saveProfile()" id="saveBtn"></button>
+        <div id="msg"></div>
+      </div>
+    </div>
+
+    <div id="waste" class="section" style="display:none;">
+      <h2 id="waste_contribution_title"></h2>
+      <form id="wasteForm">
+        <input type="text" id="waste_name" required />
+        <input type="number" id="waste_amount" min="1" required />
+        <button type="submit" id="submit_contribution"></button>
+      </form>
+      <div id="waste_msg"></div>
+    </div>
+    
+    <div id="pickup" class="section" style="display:none;">
+      <h2 id="schedule_pickup_title"></h2>
+      <form id="pickupForm">
+        <input type="text" id="pickup_name" required />
+        <input type="tel" id="pickup_phone" required pattern="[0-9]{10,}" />
+        <input type="text" id="pickup_address" required />
+        <input type="text" id="pickup_district" required />
+        <input type="number" id="pickup_pincode" required />
+        <input type="text" id="pickup_state" required />
+        <button type="submit" id="pickup_submit"></button>
+      </form>
+      <div id="pickup_msg"></div>
+    </div>
+
+    <div id="pickup_tracking" class="section" style="display:none;">
+      <h2 id="pickup_tracking_title"></h2>
+      <form id="trackingForm">
+        <input type="tel" id="tracking_phone" required pattern="[0-9]{10,}" />
+        <button type="submit" id="track_submit"></button>
+      </form>
+      <div id="tracking_msg"></div>
+      <table id="tracking_table" style="display:none;">
+        <thead>
+          <tr>
+            <th id="track_name"></th>
+            <th id="track_phone_title"></th>
+            <th id="track_address"></th>
+            <th id="track_status"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="farmerSection" class="section" style="display:none;">
+      <h2 id="farmer_section"></h2>
+      <form id="addFarmerForm">
+        <input type="text" id="farmer_name" required />
+        <input type="tel" id="farmer_phone" required />
+        <input type="text" id="farmer_address" required />
+        <button type="submit" id="add_farmer"></button>
+      </form>
+      <div id="add_farmer_msg"></div>
+      <h3 id="farmer_details"></h3>
+      <table id="farmersTable">
+        <thead>
+          <tr>
+            <th id="farmer_name_title"></th>
+            <th id="farmer_phone_title"></th>
+            <th id="farmer_address_title"></th>
+            <th id="composted_kg"></th>
+            <th id="compost_btn_title"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3 id="delivery_section"></h3>
+      <form id="assignDeliveryForm">
+        <select id="farmers_dropdown"></select>
+        <input type="number" id="delivery_amount" min="1">
+        <button type="submit" id="assign_delivery"></button>
+      </form>
+      <div id="assign_delivery_msg"></div>
+      <table id="deliveryTable">
+        <thead>
+          <tr>
+            <th id="delivery_farmer_title"></th>
+            <th id="delivery_amount_title"></th>
+            <th id="delivery_status_title"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 Clean & Green Technology | Designed for Sustainability</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

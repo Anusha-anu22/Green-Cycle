@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Green Cycle - Register</title>
+  <link rel="stylesheet" href="style1.css" />
+  <style>
+    body { font-family: Arial, sans-serif; background: #eef7ee; margin: 0; padding: 20px; }
+    h2 { text-align: center; color: #2e7d32; }
+    input, button {
+      width: 100%; margin: 10px 0; padding: 12px; font-size: 16px; border-radius: 6px; border: 1.5px solid #388e3c;
+    }
+    button {
+      background: #388e3c; color: white; border: none; cursor: pointer;
+    }
+    button:disabled { background: #a5d6a7; cursor: not-allowed; }
+    #otpInput { display: none; }
+    #msg { color: red; margin-top: 10px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Register - The Green Cycle</h2>
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="tel" id="phone" placeholder="Phone Number" required pattern="[0-9]{10}" />
+      
+      <button type="button" id="generateOtpBtn">Generate OTP</button>
+      <input type="text" id="otpInput" placeholder="Enter OTP" />
+      
+      <button type="submit" disabled id="registerBtn">Register</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    <!-- ... your styles and markup ... -->
+
+    document.getElementById('generateOtpBtn').addEventListener('click', async () => {
+      const phone = document.getElementById('phone').value.trim();
+      const msg = document.getElementById('msg');
+      if (!phone.match(/^[0-9]{10}$/)) {
+        msg.textContent = "Enter a valid 10-digit phone number.";
+        return;
+      }
+      msg.textContent = '';
+      // Send phone number to backend to generate otp
+      let res = await fetch('http://localhost:3000/generate_otp', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({phone})
+      });
+      let data = await res.json();
+      if (data.success) {
+        alert("Your OTP is: " + data.otp);   // <-- Show the OTP directly!
+        document.getElementById('otpInput').style.display = 'block';
+        document.getElementById('registerBtn').disabled = true;
+        otpVerified = false;
+      } else {
+        msg.textContent = data.error || 'OTP generation failed.';
+      }
+    });
+
+    document.getElementById('otpInput').addEventListener('input', async () => {
+      const phone = document.getElementById('phone').value.trim();
+      const userOtp = document.getElementById('otpInput').value.trim();
+      const msg = document.getElementById('msg');
+      if (userOtp.length === 6) {
+        // Verify OTP via backend
+        let res = await fetch('http://localhost:3000/verify_otp', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({phone, otp: userOtp})
+        });
+        let data = await res.json();
+        if (data.success) {
+          msg.style.color = 'green';
+          msg.textContent = 'OTP verified! You can now register.';
+          document.getElementById('registerBtn').disabled = false;
+          otpVerified = true;
+        } else {
+          msg.style.color = 'red';
+          msg.textContent = 'OTP not verified yet or invalid.';
+          document.getElementById('registerBtn').disabled = true;
+          otpVerified = false;
+        }
+      } else {
+        msg.textContent = '';
+        document.getElementById('registerBtn').disabled = true;
+        otpVerified = false;
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      if (!otpVerified) {
+        alert("Please verify OTP before registering.");
+        return;
+      }
+      const userData = {
+        name: document.getElementById('name').value.trim(),
+        username: document.getElementById('username').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        phone: document.getElementById('phone').value.trim(),
+        otp: document.getElementById('otpInput').value.trim()
+      };
+      let res = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(userData)
+      });
+      let data = await res.json();
+      if (data.success) {
+        alert('Registration successful! You can now login.');
+        window.location.href = 'login.html'; // Adjust as per your login page
+      } else {
+        msg.style.color = 'red';
+        msg.textContent = data.error || 'Registration failed.';
+      }
+    });
+  </script>
+</body>
+</html>
